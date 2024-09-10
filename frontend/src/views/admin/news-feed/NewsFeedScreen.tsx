@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Button,
   Table,
@@ -12,6 +12,7 @@ import {
   Modal,
   Box,
   TextField,
+  Typography,
 } from "@mui/material";
 import { useNewsFeed } from "../../../hooks/useNewsFeed";
 import { NewsFeed } from "../../../context/newsFeedContext";
@@ -21,13 +22,23 @@ const NewsFeedScreen = () => {
     useNewsFeed();
   const [open, setOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentNewsFeed, setCurrentNewsFeed] = useState({
     _id: "",
     itemId: "",
-    // photo: "",
     discount: "",
     description: "",
   });
+
+  // Filter news feeds based on search term
+  const filteredNewsFeeds = useMemo(() => {
+    return newsFeeds.filter(
+      (newsFeed) =>
+        newsFeed.itemId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        newsFeed.discount.toString().includes(searchTerm) ||
+        newsFeed.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [newsFeeds, searchTerm]);
 
   const handleOpen = () => {
     setIsUpdate(false);
@@ -72,9 +83,13 @@ const NewsFeedScreen = () => {
     }
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <>
-      <Container maxWidth="lg" sx={{ marginTop: 5 }}>
+      <Container maxWidth="lg" sx={{ marginTop: 5 }} className="no-print">
         <Paper
           sx={{
             display: "flex",
@@ -88,43 +103,39 @@ const NewsFeedScreen = () => {
           <Button variant="contained" color="primary" onClick={handleOpen}>
             Add News Feed
           </Button>
-          <Button
-            variant="contained"
-            color="inherit"
-            onClick={() => window.print()}
-          >
+          <TextField
+            label="Search news feeds"
+            variant="outlined"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ width: "300px" }}
+          />
+          <Button variant="contained" color="inherit" onClick={handlePrint}>
             Print Report
           </Button>
         </Paper>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ marginBottom: 5 }}>
           <Table>
             <TableHead>
               <TableRow>
-                {/* <TableCell>ID</TableCell> */}
                 <TableCell>Item</TableCell>
-                {/* <TableCell>Photo</TableCell> */}
                 <TableCell>Discount</TableCell>
                 <TableCell>Description</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell className="no-print">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {newsFeeds.map((newsFeed) => (
+              {filteredNewsFeeds.map((newsFeed) => (
                 <TableRow key={newsFeed._id}>
-                  {/* <TableCell>{newsFeed._id}</TableCell> */}
                   <TableCell>{newsFeed.itemId}</TableCell>
-                  {/* <TableCell>
-                    <img
-                      src={newsFeed.photo}
-                      alt="news"
-                      style={{ width: "50px", height: "50px" }}
-                    />
-                  </TableCell> */}
                   <TableCell>{newsFeed.discount}</TableCell>
                   <TableCell>{newsFeed.description}</TableCell>
                   <TableCell
+                    className="no-print"
                     sx={{
                       display: "flex",
+                      flexDirection: "column",
+                      alignItems: "stretch",
                       gap: 2,
                     }}
                   >
@@ -138,17 +149,13 @@ const NewsFeedScreen = () => {
                     <Button
                       variant="contained"
                       sx={{ backgroundColor: "red" }}
-                      onClick={async () => {
+                      onClick={() => {
                         if (
-                          confirm(
+                          window.confirm(
                             "Are you sure you want to delete this news feed?"
                           )
                         ) {
-                          if (await deleteNewsFeed(newsFeed._id)) {
-                            alert("News Feed deleted successfully");
-                          } else {
-                            alert("Failed to delete news feed");
-                          }
+                          deleteNewsFeed(newsFeed._id);
                         }
                       }}
                     >
@@ -161,6 +168,31 @@ const NewsFeedScreen = () => {
           </Table>
         </TableContainer>
       </Container>
+
+      {/* Printable table */}
+      <div className="print-only">
+        <Typography variant="h5" gutterBottom>
+          News Feed Report
+        </Typography>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Item</TableCell>
+              <TableCell>Discount</TableCell>
+              <TableCell>Description</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredNewsFeeds.map((newsFeed) => (
+              <TableRow key={newsFeed._id}>
+                <TableCell>{newsFeed.itemId}</TableCell>
+                <TableCell>{newsFeed.discount}</TableCell>
+                <TableCell>{newsFeed.description}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       <Modal open={open} onClose={handleClose}>
         <Box

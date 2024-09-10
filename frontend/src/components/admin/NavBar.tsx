@@ -38,7 +38,7 @@ const AdminNavBar = ({ navItems, rootPath }: AdminNavBarProps) => {
   };
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="static" className="no-print">
         <Toolbar>
           <Link
             to={rootPath.path}
@@ -58,7 +58,7 @@ const AdminNavBar = ({ navItems, rootPath }: AdminNavBarProps) => {
               display: {
                 xs: "none",
                 md: "none",
-                lg: "flex",
+                lg: "none",
                 marginLeft: "auto",
               },
             }}
@@ -89,7 +89,7 @@ const AdminNavBar = ({ navItems, rootPath }: AdminNavBarProps) => {
               display: {
                 xs: "flex",
                 md: "flex",
-                lg: "none",
+                lg: "flex",
                 marginLeft: "auto",
               },
             }}

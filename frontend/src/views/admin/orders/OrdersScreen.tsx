@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Button,
   Table,
@@ -20,6 +20,7 @@ const OrdersScreen = () => {
   const { orders, addOrder, updateOrder, deleteOrder } = useOrder();
   const [open, setOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentOrder, setCurrentOrder] = useState({
     _id: "",
     name: "",
@@ -36,6 +37,14 @@ const OrdersScreen = () => {
     status: "",
     assignedDriver: "",
   });
+
+  // Filter orders based on search term
+  const filteredOrders = useMemo(() => {
+    return orders.filter((order) =>
+      order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.status.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [orders, searchTerm]);
 
   const handleOpen = () => {
     setIsUpdate(false);
@@ -105,6 +114,12 @@ const OrdersScreen = () => {
           <Button variant="contained" color="primary" onClick={handleOpen}>
             Add Order
           </Button>
+          <TextField
+            label="Search orders"
+            variant="outlined"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
           <Button
             variant="contained"
             color="inherit"
@@ -129,7 +144,7 @@ const OrdersScreen = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <TableRow key={order._id}>
                   {/* <TableCell>{order._id}</TableCell> */}
                   <TableCell>{order.name}</TableCell>
@@ -217,7 +232,8 @@ const OrdersScreen = () => {
           />
           <TextField
             label="Total"
-            name="total"
+            name="totalAmount"
+            type="number"
             value={currentOrder.totalAmount}
             onChange={handleChange}
             fullWidth

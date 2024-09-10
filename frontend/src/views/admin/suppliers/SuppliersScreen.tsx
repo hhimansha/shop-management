@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Button,
   Table,
@@ -12,6 +12,7 @@ import {
   Modal,
   Box,
   TextField,
+  Typography,
 } from "@mui/material";
 import { useSupplier } from "../../../hooks/useSupplier";
 import { Supplier } from "../../../context/supplierContext";
@@ -21,6 +22,7 @@ const SupplierScreen = () => {
     useSupplier();
   const [open, setOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentSupplier, setCurrentSupplier] = useState({
     _id: "",
     name: "",
@@ -30,6 +32,19 @@ const SupplierScreen = () => {
     email: "",
     company: "",
   });
+
+  // Filter suppliers based on search term
+  const filteredSuppliers = useMemo(() => {
+    return suppliers.filter(
+      (supplier) =>
+        supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.mobile.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.itemId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.company.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [suppliers, searchTerm]);
 
   const handleOpen = () => {
     setIsUpdate(false);
@@ -80,9 +95,13 @@ const SupplierScreen = () => {
     }
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <>
-      <Container maxWidth="lg" sx={{ marginTop: 5 }}>
+      <Container maxWidth="lg" sx={{ marginTop: 5 }} className="no-print">
         <Paper
           sx={{
             display: "flex",
@@ -96,32 +115,33 @@ const SupplierScreen = () => {
           <Button variant="contained" color="primary" onClick={handleOpen}>
             Add Supplier
           </Button>
-          <Button
-            variant="contained"
-            color="inherit"
-            onClick={() => window.print()}
-          >
+          <TextField
+            label="Search suppliers"
+            variant="outlined"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ width: "300px" }}
+          />
+          <Button variant="contained" color="inherit" onClick={handlePrint}>
             Print Report
           </Button>
         </Paper>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ marginBottom: 5 }}>
           <Table>
             <TableHead>
               <TableRow>
-                {/* <TableCell>ID</TableCell> */}
                 <TableCell>Name</TableCell>
                 <TableCell>Address</TableCell>
                 <TableCell>Mobile</TableCell>
                 <TableCell>Item ID</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Company</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell className="no-print">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {suppliers.map((supplier) => (
+              {filteredSuppliers.map((supplier) => (
                 <TableRow key={supplier._id}>
-                  {/* <TableCell>{supplier._id}</TableCell> */}
                   <TableCell>{supplier.name}</TableCell>
                   <TableCell>{supplier.address}</TableCell>
                   <TableCell>{supplier.mobile}</TableCell>
@@ -129,8 +149,11 @@ const SupplierScreen = () => {
                   <TableCell>{supplier.email}</TableCell>
                   <TableCell>{supplier.company}</TableCell>
                   <TableCell
+                    className="no-print"
                     sx={{
                       display: "flex",
+                      flexDirection: "column",
+                      alignItems: "stretch",
                       gap: 2,
                     }}
                   >
@@ -144,17 +167,13 @@ const SupplierScreen = () => {
                     <Button
                       variant="contained"
                       sx={{ backgroundColor: "red" }}
-                      onClick={async () => {
+                      onClick={() => {
                         if (
                           window.confirm(
                             "Are you sure you want to delete this supplier?"
                           )
                         ) {
-                          if (await deleteSupplier(supplier._id)) {
-                            alert("Supplier deleted successfully");
-                          } else {
-                            alert("Failed to delete supplier");
-                          }
+                          deleteSupplier(supplier._id);
                         }
                       }}
                     >
@@ -167,6 +186,37 @@ const SupplierScreen = () => {
           </Table>
         </TableContainer>
       </Container>
+
+      {/* Printable table */}
+      <div className="print-only">
+        <Typography variant="h5" gutterBottom>
+          Supplier Report
+        </Typography>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Address</TableCell>
+              <TableCell>Mobile</TableCell>
+              <TableCell>Item ID</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Company</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredSuppliers.map((supplier) => (
+              <TableRow key={supplier._id}>
+                <TableCell>{supplier.name}</TableCell>
+                <TableCell>{supplier.address}</TableCell>
+                <TableCell>{supplier.mobile}</TableCell>
+                <TableCell>{supplier.itemId}</TableCell>
+                <TableCell>{supplier.email}</TableCell>
+                <TableCell>{supplier.company}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       <Modal open={open} onClose={handleClose}>
         <Box

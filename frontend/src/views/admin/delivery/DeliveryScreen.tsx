@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Button,
   Table,
@@ -14,6 +14,7 @@ import {
   TextField,
   MenuItem,
   Select,
+  Typography,
 } from "@mui/material";
 import { useDelivery } from "../../../hooks/useDelivery";
 import { Delivery } from "../../../context/deliveryContext";
@@ -23,6 +24,7 @@ const DeliveryScreen = () => {
     useDelivery();
   const [open, setOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentDelivery, setCurrentDelivery] = useState({
     _id: "",
     name: "",
@@ -33,6 +35,19 @@ const DeliveryScreen = () => {
     orderStatus: "",
     assignedOrders: [] as string[],
   });
+
+  // Filter deliveries based on search term
+  const filteredDeliveries = useMemo(() => {
+    return deliveries.filter(
+      (delivery) =>
+        delivery.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        delivery.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        delivery.mobile.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        delivery.vehicleId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        delivery.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        delivery.orderStatus.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [deliveries, searchTerm]);
 
   const handleOpen = () => {
     setIsUpdate(false);
@@ -89,9 +104,13 @@ const DeliveryScreen = () => {
     }
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <>
-      <Container maxWidth="lg" sx={{ marginTop: 5 }}>
+      <Container maxWidth="lg" sx={{ marginTop: 5 }} className="no-print">
         <Paper
           sx={{
             display: "flex",
@@ -105,19 +124,21 @@ const DeliveryScreen = () => {
           <Button variant="contained" color="primary" onClick={handleOpen}>
             Add Delivery
           </Button>
-          <Button
-            variant="contained"
-            color="inherit"
-            onClick={() => window.print()}
-          >
+          <TextField
+            label="Search deliveries"
+            variant="outlined"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ width: "300px" }}
+          />
+          <Button variant="contained" color="inherit" onClick={handlePrint}>
             Print Report
           </Button>
         </Paper>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ marginBottom: 5 }}>
           <Table>
             <TableHead>
               <TableRow>
-                {/* <TableCell>ID</TableCell> */}
                 <TableCell>Name</TableCell>
                 <TableCell>Address</TableCell>
                 <TableCell>Contact No</TableCell>
@@ -125,13 +146,12 @@ const DeliveryScreen = () => {
                 <TableCell>Category</TableCell>
                 <TableCell>Order Status</TableCell>
                 <TableCell>Assigned Orders</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell className="no-print">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {deliveries.map((delivery) => (
+              {filteredDeliveries.map((delivery) => (
                 <TableRow key={delivery._id}>
-                  {/* <TableCell>{delivery.id}</TableCell> */}
                   <TableCell>{delivery.name}</TableCell>
                   <TableCell>{delivery.address}</TableCell>
                   <TableCell>{delivery.mobile}</TableCell>
@@ -144,10 +164,8 @@ const DeliveryScreen = () => {
                       : 0}
                   </TableCell>
                   <TableCell
-                    sx={{
-                      display: "flex",
-                      gap: 2,
-                    }}
+                    className="no-print"
+                    sx={{ display: "flex", flexDirection: "column", alignItems: "stretch", gap: 2 }}
                   >
                     <Button
                       variant="contained"
@@ -161,7 +179,7 @@ const DeliveryScreen = () => {
                       sx={{ backgroundColor: "red" }}
                       onClick={() => {
                         if (
-                          confirm(
+                          window.confirm(
                             "Are you sure you want to delete this delivery?"
                           )
                         ) {
@@ -178,6 +196,41 @@ const DeliveryScreen = () => {
           </Table>
         </TableContainer>
       </Container>
+
+      {/* Printable table */}
+      <div className="print-only">
+        <Typography variant="h5" gutterBottom>
+          Delivery Report
+        </Typography>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Address</TableCell>
+              <TableCell>Contact No</TableCell>
+              <TableCell>Vehicle No</TableCell>
+              <TableCell>Category</TableCell>
+              <TableCell>Order Status</TableCell>
+              <TableCell>Assigned Orders</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredDeliveries.map((delivery) => (
+              <TableRow key={delivery._id}>
+                <TableCell>{delivery.name}</TableCell>
+                <TableCell>{delivery.address}</TableCell>
+                <TableCell>{delivery.mobile}</TableCell>
+                <TableCell>{delivery.vehicleId}</TableCell>
+                <TableCell>{delivery.category}</TableCell>
+                <TableCell>{delivery.orderStatus}</TableCell>
+                <TableCell>
+                  {delivery.assignedOrders ? delivery.assignedOrders.length : 0}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       <Modal open={open} onClose={handleClose}>
         <Box

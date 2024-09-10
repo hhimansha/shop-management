@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Button,
   Table,
@@ -14,6 +14,7 @@ import {
   TextField,
   TextareaAutosize,
   InputLabel,
+  Typography,
 } from "@mui/material";
 import { useFeedback } from "../../../hooks/useFeedback";
 import { Feedback } from "../../../context/feedbackContext";
@@ -23,6 +24,7 @@ const FeedbackScreen = () => {
     useFeedback();
   const [open, setOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentFeedback, setCurrentFeedback] = useState<Feedback>({
     _id: "",
     userId: {
@@ -36,6 +38,18 @@ const FeedbackScreen = () => {
     date: "",
     reply: "",
   });
+
+  // Filter feedbacks based on search term
+  const filteredFeedbacks = useMemo(() => {
+    return feedbacks.filter(
+      (feedback) =>
+        feedback.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        feedback.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        feedback.comment.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        feedback.reply?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        feedback.rating.toString().includes(searchTerm.toLowerCase())
+    );
+  }, [feedbacks, searchTerm]);
 
   const handleOpen = () => {
     setIsUpdate(false);
@@ -87,9 +101,13 @@ const FeedbackScreen = () => {
     }
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <>
-      <Container maxWidth="lg" sx={{ marginTop: 5 }}>
+      <Container maxWidth="lg" sx={{ marginTop: 5 }} className="no-print">
         <Paper
           sx={{
             display: "flex",
@@ -103,16 +121,18 @@ const FeedbackScreen = () => {
           <Button variant="contained" color="primary" onClick={handleOpen}>
             Add Feedback
           </Button>
-          {/* <div></div> */}
-          <Button
-            variant="contained"
-            color="inherit"
-            onClick={() => window.print()}
-          >
+          <TextField
+            label="Search feedback"
+            variant="outlined"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ width: "300px" }}
+          />
+          <Button variant="contained" color="inherit" onClick={handlePrint}>
             Print Report
           </Button>
         </Paper>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ marginBottom: 5 }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -122,11 +142,11 @@ const FeedbackScreen = () => {
                 <TableCell>Date</TableCell>
                 <TableCell>Comment</TableCell>
                 <TableCell>Reply</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell className="no-print">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {feedbacks?.map((feedback) => (
+              {filteredFeedbacks.map((feedback) => (
                 <TableRow key={feedback._id}>
                   <TableCell>{feedback.name}</TableCell>
                   <TableCell>{feedback.email}</TableCell>
@@ -137,8 +157,11 @@ const FeedbackScreen = () => {
                   <TableCell>{feedback.comment}</TableCell>
                   <TableCell>{feedback.reply}</TableCell>
                   <TableCell
+                    className="no-print"
                     sx={{
                       display: "flex",
+                      flexDirection: "column",
+                      alignItems: "stretch",
                       gap: 2,
                     }}
                   >
@@ -152,17 +175,13 @@ const FeedbackScreen = () => {
                     <Button
                       variant="contained"
                       sx={{ backgroundColor: "red" }}
-                      onClick={async () => {
+                      onClick={() => {
                         if (
-                          confirm(
-                            "Are you sure you want to delete this feedback reply?"
+                          window.confirm(
+                            "Are you sure you want to delete this feedback?"
                           )
                         ) {
-                          if (await deleteFeedback(feedback._id)) {
-                            alert("Feedback reply deleted successfully");
-                          } else {
-                            alert("Failed to delete feedback reply");
-                          }
+                          deleteFeedback(feedback._id);
                         }
                       }}
                     >
@@ -175,6 +194,39 @@ const FeedbackScreen = () => {
           </Table>
         </TableContainer>
       </Container>
+
+      {/* Printable table */}
+      <div className="print-only">
+        <Typography variant="h5" gutterBottom>
+          Feedback Report
+        </Typography>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Rating</TableCell>
+              <TableCell>Date</TableCell>
+              <TableCell>Comment</TableCell>
+              <TableCell>Reply</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredFeedbacks.map((feedback) => (
+              <TableRow key={feedback._id}>
+                <TableCell>{feedback.name}</TableCell>
+                <TableCell>{feedback.email}</TableCell>
+                <TableCell>{feedback.rating}</TableCell>
+                <TableCell>
+                  {new Date(feedback.date).toLocaleDateString()}
+                </TableCell>
+                <TableCell>{feedback.comment}</TableCell>
+                <TableCell>{feedback.reply}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       <Modal open={open} onClose={handleClose}>
         <Box
@@ -221,7 +273,6 @@ const FeedbackScreen = () => {
           />
           <InputLabel htmlFor="comment">Comment</InputLabel>
           <TextareaAutosize
-            // label="Comment"
             name="comment"
             value={currentFeedback.comment}
             disabled={isUpdate}
@@ -233,8 +284,6 @@ const FeedbackScreen = () => {
             }
             minRows={5}
             style={{ width: "100%", border: "1px solid #ccc", padding: 10 }}
-            // fullWidth
-            // margin="normal"
           />
           <TextField
             label="Reply"

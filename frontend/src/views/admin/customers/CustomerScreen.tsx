@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Button,
   Table,
@@ -12,6 +12,7 @@ import {
   Modal,
   Box,
   TextField,
+  Typography,
 } from "@mui/material";
 import { useCustomer } from "../../../hooks/useCustomer";
 import { Customer } from "../../../context/customerContext";
@@ -21,6 +22,7 @@ const CustomerScreen = () => {
     useCustomer();
   const [open, setOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentCustomer, setCurrentCustomer] = useState({
     _id: 0,
     username: "",
@@ -32,6 +34,21 @@ const CustomerScreen = () => {
     role: "customer",
     password: "",
   });
+
+  // Filter customers based on search term
+  const filteredCustomers = useMemo(() => {
+    return customers.filter(
+      (customer) =>
+        customer.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        customer.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        customer.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        customer.mobilenumber
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        customer.address.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [customers, searchTerm]);
 
   const handleOpen = () => {
     setIsUpdate(false);
@@ -80,9 +97,13 @@ const CustomerScreen = () => {
     }
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <>
-      <Container maxWidth="lg" sx={{ marginTop: 5 }}>
+      <Container maxWidth="lg" sx={{ marginTop: 5 }} className="no-print">
         <Paper
           sx={{
             display: "flex",
@@ -96,34 +117,35 @@ const CustomerScreen = () => {
           <Button variant="contained" color="primary" onClick={handleOpen}>
             Add Customer
           </Button>
-          <Button
-            variant="contained"
-            color="inherit"
-            onClick={() => window.print()}
-          >
+          <TextField
+            label="Search customers"
+            variant="outlined"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ width: "300px" }}
+          />
+          <Button variant="contained" color="inherit" onClick={handlePrint}>
             Print Report
           </Button>
         </Paper>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ marginBottom: 5 }}>
           <Table>
             <TableHead>
               <TableRow>
-                {/* <TableCell>ID</TableCell> */}
                 <TableCell>Username</TableCell>
                 <TableCell>First Name</TableCell>
                 <TableCell>Last Name</TableCell>
                 <TableCell>Contact No</TableCell>
                 <TableCell>Address</TableCell>
                 <TableCell>Email</TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell className="no-print">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {customers.map(
+              {filteredCustomers.map(
                 (customer) =>
                   customer.role === "customer" && (
                     <TableRow key={customer._id}>
-                      {/* <TableCell>{customer._id}</TableCell> */}
                       <TableCell>{customer.username}</TableCell>
                       <TableCell>{customer.firstname}</TableCell>
                       <TableCell>{customer.lastname}</TableCell>
@@ -131,9 +153,12 @@ const CustomerScreen = () => {
                       <TableCell>{customer.address}</TableCell>
                       <TableCell>{customer.email}</TableCell>
                       <TableCell
+                        className="no-print"
                         sx={{
                           display: "flex",
+                          flexDirection: "column",
                           gap: 2,
+                          alignItems: "stretch",
                         }}
                       >
                         <Button
@@ -162,6 +187,40 @@ const CustomerScreen = () => {
           </Table>
         </TableContainer>
       </Container>
+
+      {/* Printable table */}
+      <div className="print-only">
+        <Typography variant="h5" gutterBottom>
+          Customer Report
+        </Typography>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Username</TableCell>
+              <TableCell>First Name</TableCell>
+              <TableCell>Last Name</TableCell>
+              <TableCell>Contact No</TableCell>
+              <TableCell>Address</TableCell>
+              <TableCell>Email</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredCustomers.map(
+              (customer) =>
+                customer.role === "customer" && (
+                  <TableRow key={customer._id}>
+                    <TableCell>{customer.username}</TableCell>
+                    <TableCell>{customer.firstname}</TableCell>
+                    <TableCell>{customer.lastname}</TableCell>
+                    <TableCell>{customer.mobilenumber}</TableCell>
+                    <TableCell>{customer.address}</TableCell>
+                    <TableCell>{customer.email}</TableCell>
+                  </TableRow>
+                )
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       <Modal open={open} onClose={handleClose}>
         <Box
