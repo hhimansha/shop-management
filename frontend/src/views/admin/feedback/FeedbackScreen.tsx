@@ -12,8 +12,6 @@ import {
   Modal,
   Box,
   TextField,
-  TextareaAutosize,
-  InputLabel,
   Typography,
 } from "@mui/material";
 import { useFeedback } from "../../../hooks/useFeedback";
@@ -235,69 +233,71 @@ const FeedbackScreen = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 900,
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
           }}
         >
           <h2>{isUpdate ? "Update Feedback" : "Add Feedback"}</h2>
-          <TextField
-            label="Name"
-            name="name"
-            value={currentFeedback.name}
-            onChange={handleChange}
-            fullWidth
-            disabled={isUpdate}
-            margin="normal"
-          />
-          <TextField
-            label="Email"
-            name="email"
-            value={currentFeedback.email}
-            onChange={handleChange}
-            fullWidth
-            disabled={isUpdate}
-            margin="normal"
-          />
-          <TextField
-            label="Rating"
-            name="rating"
-            type="number"
-            inputProps={{ min: 1, max: 5 }}
-            value={currentFeedback.rating}
-            onChange={handleChange}
-            fullWidth
-            disabled={isUpdate}
-            margin="normal"
-          />
-          <InputLabel htmlFor="comment">Comment</InputLabel>
-          <TextareaAutosize
-            name="comment"
-            value={currentFeedback.comment}
-            disabled={isUpdate}
-            onChange={(e) =>
-              setCurrentFeedback({
-                ...currentFeedback,
-                comment: e.target.value,
-              })
-            }
-            minRows={5}
-            style={{ width: "100%", border: "1px solid #ccc", padding: 10 }}
-          />
-          <TextField
-            label="Reply"
-            name="reply"
-            value={currentFeedback.reply}
-            onChange={(e) =>
-              setCurrentFeedback({
-                ...currentFeedback,
-                reply: e.target.value,
-              })
-            }
-            fullWidth
-            margin="normal"
-          />
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+            <TextField
+              label="Name"
+              name="name"
+              value={currentFeedback.name}
+              onChange={handleChange}
+              fullWidth
+              disabled={isUpdate}
+              margin="normal"
+            />
+            <TextField
+              label="Email"
+              name="email"
+              value={currentFeedback.email}
+              onChange={handleChange}
+              fullWidth
+              disabled={isUpdate}
+              margin="normal"
+            />
+            <TextField
+              label="Rating"
+              name="rating"
+              type="number"
+              inputProps={{ min: 1, max: 5 }}
+              value={currentFeedback.rating}
+              onChange={handleChange}
+              fullWidth
+              disabled={isUpdate}
+              margin="normal"
+            />
+            <Box></Box>
+            <TextField
+              label="Comment"
+              name="comment"
+              value={currentFeedback.comment}
+              onChange={handleChange}
+              disabled={isUpdate}
+              fullWidth
+              rows={5}
+              multiline
+              margin="normal"
+            />
+            <TextField
+              label="Reply"
+              name="reply"
+              value={currentFeedback.reply}
+              rows={5}
+              multiline
+              onChange={(e) =>
+                setCurrentFeedback({
+                  ...currentFeedback,
+                  reply: e.target.value,
+                })
+              }
+              fullWidth
+              margin="normal"
+            />
+          </Box>
           <Box
             sx={{
               display: "flex",

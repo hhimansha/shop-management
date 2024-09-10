@@ -5,7 +5,7 @@ exports.placeOrder = async (req, res) => {
     try {
         // Get user ID from authenticated user
         const userId = req.user.id;
-        
+
         // Extract order details from the request body
         const { name, address, mobile, totalAmount, items } = req.body;
 
@@ -49,15 +49,12 @@ exports.getAllOrders = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
     try {
         const { orderId } = req.params;
-        const { status } = req.body;
 
-        const order = await Order.findById(orderId);
+
+        const order = await Order.findByIdAndUpdate(orderId, req.body, { new: true });
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
-
-        order.status = status;
-        await order.save();
 
         res.status(200).json({ message: 'Order status updated successfully', order });
     } catch (error) {

@@ -201,22 +201,23 @@ const NewsFeedScreen = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 900,
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
           }}
         >
           <h2>{isUpdate ? "Update News Feed" : "Add News Feed"}</h2>
-          <TextField
-            label="Item ID"
-            name="itemId"
-            value={currentNewsFeed.itemId}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          {/* <TextField
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+            <TextField
+              label="Item ID"
+              name="itemId"
+              value={currentNewsFeed.itemId}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            {/* <TextField
             label="Photo URL"
             name="photo"
             value={currentNewsFeed.photo}
@@ -224,22 +225,25 @@ const NewsFeedScreen = () => {
             fullWidth
             margin="normal"
           /> */}
-          <TextField
-            label="Discount"
-            name="discount"
-            value={currentNewsFeed.discount}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Description"
-            name="description"
-            value={currentNewsFeed.description}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
+            <TextField
+              label="Discount"
+              name="discount"
+              value={currentNewsFeed.discount}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Description"
+              name="description"
+              value={currentNewsFeed.description}
+              onChange={handleChange}
+              multiline
+              rows={5}
+              fullWidth
+              margin="normal"
+            />
+          </Box>
           <Box
             sx={{
               display: "flex",

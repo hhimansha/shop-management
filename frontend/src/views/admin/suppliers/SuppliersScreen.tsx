@@ -225,61 +225,63 @@ const SupplierScreen = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 900,
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
           }}
         >
           <h2>{isUpdate ? "Update Supplier" : "Add Supplier"}</h2>
-          <TextField
-            label="Name"
-            name="name"
-            value={currentSupplier.name}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Address"
-            name="address"
-            value={currentSupplier.address}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Mobile"
-            name="mobile"
-            value={currentSupplier.mobile}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Item ID"
-            name="itemId"
-            value={currentSupplier.itemId}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Email"
-            name="email"
-            value={currentSupplier.email}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Company"
-            name="company"
-            value={currentSupplier.company}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+            <TextField
+              label="Name"
+              name="name"
+              value={currentSupplier.name}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Address"
+              name="address"
+              value={currentSupplier.address}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Mobile"
+              name="mobile"
+              value={currentSupplier.mobile}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Item ID"
+              name="itemId"
+              value={currentSupplier.itemId}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Email"
+              name="email"
+              value={currentSupplier.email}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Company"
+              name="company"
+              value={currentSupplier.company}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+          </Box>
           <Box
             sx={{
               display: "flex",

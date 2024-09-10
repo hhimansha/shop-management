@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createContext, useState, ReactNode, useEffect } from "react";
+import { createContext, useState, ReactNode, useEffect, useCallback } from "react";
 import { useAdminAuth } from "../hooks/useAdminAuth";
 
 export interface Delivery {
@@ -18,6 +18,7 @@ export interface DeliveryContextType {
   addDelivery: (delivery: Delivery) => Promise<boolean>;
   updateDelivery: (delivery: Delivery) => Promise<boolean>;
   deleteDelivery: (id: string | undefined) => Promise<boolean>;
+  getDeliveryName: (driverId: string) => string;
 }
 
 const DeliveryContext = createContext<DeliveryContextType | undefined>(
@@ -95,6 +96,14 @@ export const DeliveryProvider = ({ children }: { children: ReactNode }) => {
       });
   };
 
+  const getDeliveryName = useCallback(
+    (driverId: string) => {
+      const driver = deliveries.find((d) => d._id === driverId);
+      return driver ? driver.name : "Unassigned";
+    },
+    [deliveries]
+  );
+
   useEffect(() => {
     console.log("Deliveries:", deliveries);
   }, [deliveries]);
@@ -105,7 +114,7 @@ export const DeliveryProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <DeliveryContext.Provider
-      value={{ deliveries, addDelivery, updateDelivery, deleteDelivery }}
+      value={{ deliveries, addDelivery, updateDelivery, deleteDelivery, getDeliveryName }}
     >
       {children}
     </DeliveryContext.Provider>

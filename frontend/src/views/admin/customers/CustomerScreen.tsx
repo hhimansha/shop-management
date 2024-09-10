@@ -229,71 +229,73 @@ const CustomerScreen = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 900,
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
           }}
         >
           <h2>{isUpdate ? "Update Customer" : "Add Customer"}</h2>
-          <TextField
-            label="Name"
-            name="username"
-            value={currentCustomer.username}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="First Name"
-            name="firstname"
-            value={currentCustomer.firstname}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Last Name"
-            name="lastname"
-            value={currentCustomer.lastname}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Contact No"
-            name="mobilenumber"
-            value={currentCustomer.mobilenumber}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Address"
-            name="address"
-            value={currentCustomer.address}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Email"
-            name="email"
-            value={currentCustomer.email}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          {!isUpdate ? (
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
             <TextField
-              label="Password"
-              name="password"
-              value={currentCustomer.password}
+              label="Name"
+              name="username"
+              value={currentCustomer.username}
               onChange={handleChange}
               fullWidth
               margin="normal"
             />
-          ) : null}
+            <TextField
+              label="First Name"
+              name="firstname"
+              value={currentCustomer.firstname}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Last Name"
+              name="lastname"
+              value={currentCustomer.lastname}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Contact No"
+              name="mobilenumber"
+              value={currentCustomer.mobilenumber}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Address"
+              name="address"
+              value={currentCustomer.address}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Email"
+              name="email"
+              value={currentCustomer.email}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            {!isUpdate ? (
+              <TextField
+                label="Password"
+                name="password"
+                value={currentCustomer.password}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+              />
+            ) : null}
+          </Box>
           <Box
             sx={{
               display: "flex",

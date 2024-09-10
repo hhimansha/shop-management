@@ -15,6 +15,8 @@ import {
   MenuItem,
   Select,
   Typography,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import { useDelivery } from "../../../hooks/useDelivery";
 import { Delivery } from "../../../context/deliveryContext";
@@ -145,7 +147,7 @@ const DeliveryScreen = () => {
                 <TableCell>Vehicle No</TableCell>
                 <TableCell>Category</TableCell>
                 <TableCell>Order Status</TableCell>
-                <TableCell>Assigned Orders</TableCell>
+                {/* <TableCell>Assigned Orders</TableCell> */}
                 <TableCell className="no-print">Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -158,14 +160,19 @@ const DeliveryScreen = () => {
                   <TableCell>{delivery.vehicleId}</TableCell>
                   <TableCell>{delivery.category}</TableCell>
                   <TableCell>{delivery.orderStatus}</TableCell>
-                  <TableCell>
+                  {/* <TableCell>
                     {delivery.assignedOrders
                       ? delivery.assignedOrders.length
                       : 0}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell
                     className="no-print"
-                    sx={{ display: "flex", flexDirection: "column", alignItems: "stretch", gap: 2 }}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "stretch",
+                      gap: 2,
+                    }}
                   >
                     <Button
                       variant="contained"
@@ -211,7 +218,7 @@ const DeliveryScreen = () => {
               <TableCell>Vehicle No</TableCell>
               <TableCell>Category</TableCell>
               <TableCell>Order Status</TableCell>
-              <TableCell>Assigned Orders</TableCell>
+              {/* <TableCell>Assigned Orders</TableCell> */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -223,9 +230,9 @@ const DeliveryScreen = () => {
                 <TableCell>{delivery.vehicleId}</TableCell>
                 <TableCell>{delivery.category}</TableCell>
                 <TableCell>{delivery.orderStatus}</TableCell>
-                <TableCell>
+                {/* <TableCell>
                   {delivery.assignedOrders ? delivery.assignedOrders.length : 0}
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             ))}
           </TableBody>
@@ -239,69 +246,85 @@ const DeliveryScreen = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 900,
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
           }}
         >
           <h2>{isUpdate ? "Update Delivery" : "Add Delivery"}</h2>
-          <TextField
-            label="Name"
-            name="name"
-            value={currentDelivery.name}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Address"
-            name="address"
-            value={currentDelivery.address}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Contact No"
-            name="mobile"
-            value={currentDelivery.mobile}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Vehicle No"
-            name="vehicleId"
-            value={currentDelivery.vehicleId}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Category"
-            name="category"
-            value={currentDelivery.category}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-          <Select
-            label="Order Status"
-            name="orderStatus"
-            value={currentDelivery.orderStatus}
-            onChange={(e) =>
-              setCurrentDelivery({
-                ...currentDelivery,
-                orderStatus: e.target.value,
-              })
-            }
-            fullWidth
-          >
-            <MenuItem value="pending">Pending</MenuItem>
-            <MenuItem value="in-progress">In Progress</MenuItem>
-            <MenuItem value="completed">Completed</MenuItem>
-          </Select>
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+            <TextField
+              label="Name"
+              name="name"
+              value={currentDelivery.name}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Address"
+              name="address"
+              value={currentDelivery.address}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Contact No"
+              name="mobile"
+              value={currentDelivery.mobile}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Vehicle No"
+              name="vehicleId"
+              value={currentDelivery.vehicleId}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="category-label">Category</InputLabel>
+              <Select
+                label="Category"
+                name="category"
+                value={currentDelivery.category}
+                onChange={(e) =>
+                  setCurrentDelivery({
+                    ...currentDelivery,
+                    category: e.target.value,
+                  })
+                }
+                fullWidth
+              >
+                <MenuItem value="car">Car</MenuItem>
+                <MenuItem value="bike">Bike</MenuItem>
+                <MenuItem value="truck">Truck</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="order-status-label">Order Status</InputLabel>
+              <Select
+                label="Order Status"
+                name="orderStatus"
+                value={currentDelivery.orderStatus}
+                onChange={(e) =>
+                  setCurrentDelivery({
+                    ...currentDelivery,
+                    orderStatus: e.target.value,
+                  })
+                }
+                fullWidth
+              >
+                <MenuItem value="pending">Pending</MenuItem>
+                <MenuItem value="in-progress">In Progress</MenuItem>
+                <MenuItem value="completed">Completed</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
           <Box
             sx={{
               display: "flex",

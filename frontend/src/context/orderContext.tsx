@@ -32,7 +32,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
   const addOrder = async (order: Order) => {
     return await axios
-      .post("http://localhost:3000/api/auth/add/orders", order, {
+      .post("http://localhost:3000/api/auth/place-order", order, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
