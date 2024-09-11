@@ -7,11 +7,9 @@ const orderSchema = new mongoose.Schema({
   mobile: { type: String, required: true }, // Mobile number of the customer
   totalAmount: { type: Number, required: true }, // Total amount of the order
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // User ID (assumed user is logged in)
-  items: [{ 
-      itemId: { type: mongoose.Schema.Types.ObjectId, ref: 'Item', required: true } // Item ID
-  }],
+  items: [{ type: String, required: true }],
   status: { type: String, enum: ['pending', 'in-progress', 'completed'], default: 'pending' },
-  assignedDriver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null }
+  assignedDriver: { type: mongoose.Schema.Types.ObjectId, ref: 'driver', default: null }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

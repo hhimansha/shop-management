@@ -4,11 +4,13 @@ const Order = require('../Models/order.model'); // Assuming the model is in the 
 exports.placeOrder = async (req, res) => {
     try {
         // Get user ID from authenticated user
-        const userId = req.user.id;
+        const userId = req.user.userId;
 
         // Extract order details from the request body
         const { name, address, mobile, totalAmount, items } = req.body;
-
+        console.log(req.user);
+        console.log(userId);
+        console.log(req.body.items);
         // Create a new order
         const order = new Order({
             name,
@@ -92,9 +94,10 @@ exports.deleteOrder = async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        await order.remove();
+        await order.deleteOne();
         res.status(200).json({ message: 'Order deleted successfully' });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: 'Error deleting order', error });
     }
 };

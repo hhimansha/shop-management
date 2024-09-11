@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import AdminDashboardLayout from "./views/admin/AdminDashboardLayout";
 import CustomerScreenLayout from "./views/admin/customers/CustomerLayout";
 import AdminDashboardScreen from "./views/admin/AdminDashboardScreen";
@@ -52,6 +52,7 @@ function App() {
           </Route>
           <Route path="/adminlogin" element={<AdminLogin />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/" element={<Navigate to="/adminlogin" />} />
         </Routes>
   );
 }

@@ -9,10 +9,7 @@ export interface Order {
   mobile: string;
   totalAmount: number;
   user: string;
-  items: {
-    itemId: string;
-    _id: string;
-  }[];
+  items: string[];
   status: string;
   assignedDriver: string;
 }
@@ -37,8 +34,8 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then((response) => {
-        setOrders([...orders, response.data]);
+      .then(() => {
+        setOrders([...orders, order]);
         return true;
       })
       .catch((error) => {
@@ -49,13 +46,21 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
   const updateOrder = async (updatedOrder: Order) => {
     return await axios
-      .put(`http://localhost:3000/api/auth/order/${updatedOrder._id}/status`, updatedOrder, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .put(
+        `http://localhost:3000/api/auth/order/${updatedOrder._id}/status`,
+        updatedOrder,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then(() => {
-        setOrders(orders.map((order) => order._id === updatedOrder._id ? updatedOrder : order));
+        setOrders(
+          orders.map((order) =>
+            order._id === updatedOrder._id ? updatedOrder : order
+          )
+        );
         return true;
       })
       .catch((error) => {
@@ -66,7 +71,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteOrder = async (id: string) => {
     return await axios
-      .delete(`http://localhost:3000/api/auth/delete/orders/${id}`, {
+      .delete(`http://localhost:3000/api/auth/order/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -74,6 +79,10 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       .then(() => {
         setOrders(orders.filter((order) => order._id !== id));
         return true;
+      })
+      .catch((error) => {
+        console.error("Error deleting order:", error);
+        return false;
       });
   };
 

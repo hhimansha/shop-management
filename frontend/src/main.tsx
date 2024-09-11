@@ -10,24 +10,27 @@ import { OrderProvider } from "./context/orderContext.tsx";
 import App from "./App.tsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
+import { ItemProvider } from "./context/itemContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <AdminAuthProvider>
-        <NewsFeedProvider>
-          <CustomerProvider>
-            <FeedbackProvider>
-              <DeliveryProvider>
-                <SupplierProvider>
-                  <OrderProvider>
-                    <App />
-                  </OrderProvider>
-                </SupplierProvider>
-              </DeliveryProvider>
-            </FeedbackProvider>
-          </CustomerProvider>
-        </NewsFeedProvider>
+        <ItemProvider>
+          <NewsFeedProvider>
+            <CustomerProvider>
+              <FeedbackProvider>
+                <DeliveryProvider>
+                  <SupplierProvider>
+                    <OrderProvider>
+                      <App />
+                    </OrderProvider>
+                  </SupplierProvider>
+                </DeliveryProvider>
+              </FeedbackProvider>
+            </CustomerProvider>
+          </NewsFeedProvider>
+        </ItemProvider>
       </AdminAuthProvider>
     </BrowserRouter>
   </StrictMode>

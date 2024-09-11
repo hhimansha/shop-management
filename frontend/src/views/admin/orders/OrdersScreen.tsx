@@ -21,26 +21,23 @@ import {
 import { useOrder } from "../../../hooks/useOrder";
 import { useDelivery } from "../../../hooks/useDelivery";
 import { Order } from "../../../context/orderContext";
+import { useItem } from "../../../hooks/useItem";
 
 const OrdersScreen = () => {
   const { orders, addOrder, updateOrder, deleteOrder } = useOrder();
   const { deliveries, getDeliveryName } = useDelivery();
+  const { items, getItem } = useItem();
   const [open, setOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentOrder, setCurrentOrder] = useState({
+  const [currentOrder, setCurrentOrder] = useState<Order>({
     _id: "",
     name: "",
     address: "",
     mobile: "",
     totalAmount: 0,
     user: "",
-    items: [
-      {
-        itemId: "",
-        _id: "",
-      },
-    ],
+    items: [],
     status: "",
     assignedDriver: "",
   });
@@ -49,11 +46,16 @@ const OrdersScreen = () => {
   const filteredOrders = useMemo(() => {
     return orders.filter(
       (order) =>
-        order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        getDeliveryName(order.assignedDriver).toLowerCase().includes(searchTerm.toLowerCase())
+        order.name?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+        order.status?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+        order.address?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+        order.mobile?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+        order.totalAmount?.toString().includes(searchTerm?.toLowerCase())
+      // getDeliveryName(order.assignedDriver)
+      //   ?.toLowerCase()
+      //   .includes(searchTerm?.toLowerCase())
     );
-  }, [orders, searchTerm, getDeliveryName]);
+  }, [orders, searchTerm]);
 
   const handleOpen = () => {
     setIsUpdate(false);
@@ -64,12 +66,7 @@ const OrdersScreen = () => {
       mobile: "",
       totalAmount: 0,
       user: "",
-      items: [
-        {
-          itemId: "",
-          _id: "",
-        },
-      ],
+      items: [],
       status: "",
       assignedDriver: "",
     });
@@ -132,17 +129,13 @@ const OrdersScreen = () => {
             variant="outlined"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{ width: '300px' }}
+            sx={{ width: "300px" }}
           />
-          <Button
-            variant="contained"
-            color="inherit"
-            onClick={handlePrint}
-          >
+          <Button variant="contained" color="inherit" onClick={handlePrint}>
             Print Report
           </Button>
         </Paper>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ marginBottom: 5 }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -163,7 +156,7 @@ const OrdersScreen = () => {
                   <TableCell>{order.address}</TableCell>
                   <TableCell>{order.mobile}</TableCell>
                   <TableCell>
-                    {order.items.map((item) => item.itemId).join(", ")}
+                    {order.items.map((item) => getItem(item)?.name).join(", ")}
                   </TableCell>
                   <TableCell>{order.totalAmount}</TableCell>
                   <TableCell>{order.status}</TableCell>
@@ -179,7 +172,17 @@ const OrdersScreen = () => {
                     <Button
                       variant="contained"
                       sx={{ backgroundColor: "red", marginLeft: 2 }}
-                      onClick={() => deleteOrder(order._id)}
+                      onClick={async () => {
+                        if (
+                          confirm("Are you sure you want to delete this order?")
+                        ) {
+                          if (await deleteOrder(order._id)) {
+                            alert("Order deleted successfully");
+                          } else {
+                            alert("Failed to delete order");
+                          }
+                        }
+                      }}
                     >
                       Delete
                     </Button>
@@ -193,7 +196,9 @@ const OrdersScreen = () => {
 
       {/* Printable table */}
       <div className="print-only">
-        <Typography variant="h4" gutterBottom>Order Report</Typography>
+        <Typography variant="h4" gutterBottom>
+          Order Report
+        </Typography>
         <Table>
           <TableHead>
             <TableRow>
@@ -213,7 +218,7 @@ const OrdersScreen = () => {
                 <TableCell>{order.address}</TableCell>
                 <TableCell>{order.mobile}</TableCell>
                 <TableCell>
-                  {order.items.map((item) => item.itemId).join(", ")}
+                  {order.items.map((item) => getItem(item)?.name).join(", ")}
                 </TableCell>
                 <TableCell>{order.totalAmount}</TableCell>
                 <TableCell>{order.status}</TableCell>
@@ -263,14 +268,27 @@ const OrdersScreen = () => {
               fullWidth
               margin="normal"
             />
-            <TextField
-              label="Item ID"
-              name="itemId"
-              value={currentOrder.items.map((item) => item.itemId).join(", ")}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-            />
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Items</InputLabel>
+              <Select
+                value={currentOrder.items}
+                label="Items"
+                name="items"
+                // multiple
+                onChange={(e) =>
+                  setCurrentOrder({
+                    ...currentOrder,
+                    items: [e.target.value as string],
+                  })
+                }
+              >
+                {items.map((item) => (
+                  <MenuItem key={item._id} value={item._id}>
+                    {item.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <TextField
               label="Total"
               name="totalAmount"
@@ -280,7 +298,6 @@ const OrdersScreen = () => {
               fullWidth
               margin="normal"
             />
-            <Box></Box>
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Status</InputLabel>
               <Select
@@ -291,33 +308,35 @@ const OrdersScreen = () => {
                   setCurrentOrder({ ...currentOrder, status: e.target.value })
                 }
               >
-                <MenuItem value={"Pending"}>Pending</MenuItem>
+                <MenuItem value={"pending"}>Pending</MenuItem>
                 <MenuItem value={"in-progress"}>In Progress</MenuItem>
                 <MenuItem value={"completed"}>Completed</MenuItem>
               </Select>
             </FormControl>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">
-                Assigned Driver
-              </InputLabel>
-              <Select
-                value={currentOrder.assignedDriver}
-                label="Assigned Driver"
-                name="assignedDriver"
-                onChange={(e) =>
-                  setCurrentOrder({
-                    ...currentOrder,
-                    assignedDriver: e.target.value,
-                  })
-                }
-              >
-                {deliveries.map((delivery) => (
-                  <MenuItem key={delivery._id} value={delivery._id}>
-                    {delivery.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            {isUpdate && (
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">
+                  Assigned Driver
+                </InputLabel>
+                <Select
+                  value={currentOrder.assignedDriver}
+                  label="Assigned Driver"
+                  name="assignedDriver"
+                  onChange={(e) =>
+                    setCurrentOrder({
+                      ...currentOrder,
+                      assignedDriver: e.target.value,
+                    })
+                  }
+                >
+                  {deliveries.map((delivery) => (
+                    <MenuItem key={delivery._id} value={delivery._id}>
+                      {delivery.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
           </Box>
           <Box
             sx={{
