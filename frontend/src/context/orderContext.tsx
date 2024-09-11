@@ -34,8 +34,9 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then(() => {
-        setOrders([...orders, order]);
+      .then((response) => {
+        console.log("response", response);
+        setOrders([...orders, { ...order, _id: response.data.order._id }]);
         return true;
       })
       .catch((error) => {
@@ -45,10 +46,11 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateOrder = async (updatedOrder: Order) => {
+    const { _id, ...orderData } = updatedOrder;
     return await axios
       .put(
         `http://localhost:3000/api/auth/order/${updatedOrder._id}/status`,
-        updatedOrder,
+        orderData,
         {
           headers: {
             Authorization: `Bearer ${token}`,

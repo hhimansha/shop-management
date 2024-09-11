@@ -8,9 +8,6 @@ exports.placeOrder = async (req, res) => {
 
         // Extract order details from the request body
         const { name, address, mobile, totalAmount, items } = req.body;
-        console.log(req.user);
-        console.log(userId);
-        console.log(req.body.items);
         // Create a new order
         const order = new Order({
             name,
@@ -30,9 +27,10 @@ exports.placeOrder = async (req, res) => {
             order
         });
     } catch (error) {
+        console.log(error);
         res.status(500).json({
             message: 'Error placing order',
-            error
+            
         });
     }
 };
@@ -53,13 +51,14 @@ exports.updateOrderStatus = async (req, res) => {
         const { orderId } = req.params;
 
 
-        const order = await Order.findByIdAndUpdate(orderId, req.body, { new: true });
+        const order = await Order.findByIdAndUpdate(orderId, req.body , { new: true });
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
 
         res.status(200).json({ message: 'Order status updated successfully', order });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: 'Error updating order status', error });
     }
 };
