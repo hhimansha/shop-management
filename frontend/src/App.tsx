@@ -25,9 +25,9 @@ function App() {
           <Route
             path="/admindashboard"
             element={
-              <PrivateRoute>
+              // <PrivateRoute>
                 <AdminDashboardLayout />
-              </PrivateRoute>
+              // </PrivateRoute>
             }
           >
             <Route index element={<AdminDashboardScreen />} />
