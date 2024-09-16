@@ -8,7 +8,7 @@ import { SupplierProvider } from "./context/supplierContext.tsx";
 import { AdminAuthProvider } from "./context/adminAuthContext.tsx";
 import { OrderProvider } from "./context/orderContext.tsx";
 import App from "./App.tsx";
-import "./index.css";
+import './index.css';
 import { BrowserRouter } from "react-router-dom";
 import { ItemProvider } from "./context/itemContext.tsx";
 
